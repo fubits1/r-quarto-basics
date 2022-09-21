@@ -1,0 +1,220 @@
+---
+title: "Observable Inputs.table from R data.frame / tibble"
+format:
+  html:
+    toc: true
+    toc-title: "TOC"
+    css: ./css/style.css
+  # pdf:
+  #   toc: true
+  #   number-sections: true
+  # docx:
+  #   toc: true
+  #   number-sections: true
+  #   highlight-style: github
+---
+# Demo
+
+> fdfd
+
+```{r}
+#| warning: false
+library(tidyverse)
+```
+
+
+# R: ggplot toy
+
+```{r}
+ggplot(mpg, aes(x = hwy, y = cty, color = cyl)) +
+  geom_point(alpha = 0.5, size = 2) +
+  scale_color_viridis_c() +
+  theme_minimal()
+```
+
+# Transpose R data object
+
+> R df / tibble needs to be transposed for Observable's Inputs.table  
+> Inputs.table needs an Array of Objects to iterate over
+
+> Consider turning this into a function  
+> Consider how to account for potential row names
+
+```{r}
+data_raw <- mtcars %>%
+  rownames_to_column("car") %>%
+  # tibble() %>%
+  transpose()
+```
+
+::: {.panel-tabset}
+
+## base mtcars
+
+```{r}
+typeof(mtcars)
+```
+
+```{r}
+class(mtcars)
+```
+
+```{r}
+str(mtcars)
+```
+
+## transposed
+
+```{r}
+typeof(data_raw)
+```
+```{r}
+class(data_raw)
+```
+
+```{r}
+str(data_raw)
+```
+
+## Bonus: tibble
+
+```{r echo=FALSE}
+data_raw_2 <- mtcars %>%
+  rownames_to_column("car") %>%
+  tibble() %>%
+  transpose()
+```
+
+```{r}
+typeof(tibble(mtcars))
+```
+```{r}
+class(tibble(mtcars))
+```
+
+```{r}
+str(data_raw_2)
+```
+
+:::
+
+# Expose to JS
+
+:::{.callout-warning}
+## Caution: `ojs_define` is
+<ul>
+  <li>not available as an executable chunk from within the `.qmd` document</li>
+  <li>exposes the object / data in the client (search for `<script type="ojs-define">` in the DOM tree)</li>
+</ul>
+
+:::
+
+```{r}
+ojs_define(data_raw)
+```
+
+# JS Table from R data
+
+> dropdown with var names for dynamic sorting  
+> pre-pending `null` to allow no choice as inital value
+
+```{ojs}
+viewof dropdown = Inputs.select([null].concat(Object.keys(data_raw[0]).sort()),
+  {value: null, label: "Sort by", 
+  <!-- sort: true,  // or sort: "car"-->
+  unique: true}
+)
+```
+
+```{ojs}
+viewof tableData = Inputs.table(data_raw,
+  {sort: dropdown, required: false,
+    format: {
+      mpg: sparkbar(d3.max(data_raw, d => d.mpg)),
+      cyl: sparkbar(d3.max(data_raw, d => d.cyl)),
+      disp: sparkbar(d3.max(data_raw, d => d.disp)),
+      hp: sparkbar(d3.max(data_raw, d => d.hp)),
+      qsec: sparkbar(d3.max(data_raw, d => d.qsec))
+    }
+  }
+)
+```
+
+```{ojs}
+tableData
+```
+
+### Bonus: Mean HP from seleted rows
+
+```{ojs}
+//| echo: false
+html`Mean HP: ${(tableData.reduce((a,b) => a + b.hp, 0) / tableData.length) || "none selected" }`
+```
+
+# Plot
+
+## min/max hp with R
+
+> Just a proof-of-concept; can be solved with ojs Plot generics
+
+```{r}
+min <- min(mtcars$hp)
+max <- max(mtcars$hp)
+```
+
+```{r}
+ojs_define(min)
+ojs_define(max)
+```
+
+```{ojs}
+chart = Plot.plot({
+  inset: 8,
+  grid: true,
+  facet: {
+    data: data_raw,
+    y: doFacet && "cyl"
+  },
+  color: {
+    legend: true,
+  },
+  marks: [
+    Plot.dot(data_raw,{filter: d => d.hp <= minimum, x: "cyl", y: "mpg", stroke: "car"})
+  ]
+})
+```
+
+```{ojs}
+viewof minimum = Inputs.range([min, max], { value: max, step: 1, label: "hp filter" })
+viewof doFacet = Inputs.toggle({label: "Facet", value: true})
+```
+
+```{ojs}
+import {serialize} from "@mbostock/saving-svg"
+<!-- rasterize -->
+```
+
+```{ojs}
+DOM.download(() => serialize(chart), undefined, "Save as SVG")
+<!-- DOM.download(() => rasterize(chart), undefined, "Save as PNG") -->
+```
+
+# Helper Functions
+
+## Sparkline for table
+
+```{ojs}
+<!-- from https://observablehq.com/@observablehq/input-table#sparkbar -->
+<!-- import {sparkbar} from "@observablehq/input-table" -->
+function sparkbar(max) {
+  return x => htl.html`<div style="
+    background: lightblue;
+    width: ${100 * x / max}%;
+    float: right;
+    padding-right: 3px;
+    box-sizing: border-box;
+    overflow: visible;
+    display: flex;
+    justify-content: end;">${x.toLocaleString("en")}`
+}
+```

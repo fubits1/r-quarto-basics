@@ -1,0 +1,126 @@
+---
+title: "Mermaid to SVG"
+format:
+  html:
+    toc: true
+    toc-title: "TOC"
+    css: ./css/style.css
+    include-in-header:
+      text: '<script src="./js/mermaid.min.js"></script>'
+    include-after-body:
+      text: "<script>mermaid.initialize({startOnLoad:true})</script>"
+---
+
+# Mermaid Options + SVG Export
+
+```{ojs}
+viewof message = Inputs.text({label: "message", value: "hello world"})
+```
+
+```{ojs}
+//| code-fold: show
+//| label: fig-mermaid-test-export
+//| fig-cap: "Selector: `#fig-mermaid-test-export`"
+mermaid`sequenceDiagram
+"Actor A" ->> "Actor B": ${message}
+"Actor B" -->> "Actor A": response
+`
+```
+
+```{ojs}
+//| echo: false
+viewof svgSelector = Inputs.text({label: "id", value: "#fig-mermaid-test-export"})
+```
+
+```{ojs}
+//| echo: false
+DOM.download(() => exportSVG(svgSelector), "fig-mermaid-test-export.svg", "Export as SVG")
+```
+
+## Helper Function: SVG Export
+
+> Mod. of https://observablehq.com/@mbostock/saving-svg#serialize
+
+```{ojs}
+exportSVG = function(svgSelector) {
+  let domSVG = document.querySelector(svgSelector + " svg")
+  const xmlns = "http://www.w3.org/2000/xmlns/"
+  const xlinkns = "http://www.w3.org/1999/xlink"
+  const svgns = "http://www.w3.org/2000/svg"
+
+  domSVG = domSVG.cloneNode(true)
+  const fragment = window.location.href + "#"
+  const walker = document.createTreeWalker(domSVG, NodeFilter.SHOW_ELEMENT)
+  while (walker.nextNode()) {
+    for (const attr of walker.currentNode.attributes) {
+      if (attr.value.includes(fragment)) {
+        attr.value = attr.value.replace(fragment, "#")
+      }
+    }
+  }
+  domSVG.setAttributeNS(xmlns, "xmlns", svgns)
+  domSVG.setAttributeNS(xmlns, "xmlns:xlink", xlinkns)
+  const serializer = new window.XMLSerializer
+  const string = serializer.serializeToString(domSVG)
+  return new Blob([string], {
+    type: "image/svg+xml"
+  })
+}
+```
+
+<hr>
+
+
+# Mermaid Chunk Options
+
+## Track 1: with {ojs}
+
+```{ojs}
+//| code-fold: false
+mermaid`graph TD
+A-->B
+A-->C
+B-->D
+C-->D
+`
+```
+
+```{ojs}
+//| code-fold: show
+mermaid
+`
+flowchart TD
+    A[Start] --> B{Is it?}
+    B -- Yes --> C[OK]
+    C --> D[Rethink]
+    D --> B
+    B -- No ----> E[End]
+`
+```
+
+### With Input
+
+```{ojs}
+viewof message2 = Inputs.text({label: "message", value: "hello world"})
+```
+
+```{ojs}
+//| code-fold: show
+mermaid`sequenceDiagram
+"Actor A" ->> "Actor B": ${message2}
+"Actor B" -->> "Actor A": response
+`
+```
+
+## Track 2: with regular Knitr chunks
+
+```{=html}
+<pre class="mermaid">
+flowchart TD
+    A[Start] --> B{Is it?}
+    B -- Yes --> C[OK]
+    C --> D[Rethink]
+    D --> B
+    B -- No ----> E[End]
+</pre>
+```

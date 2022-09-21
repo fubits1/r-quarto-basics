@@ -1,0 +1,73 @@
+---
+title: "Quarto & JS"
+format:
+  html:
+    include-in-header:
+      text: '<script src="./js/copyToClipboard.js"></script>'
+---
+
+# Task: Copy R Output Chunk to Clipboard with JS
+
+
+## Input/Output
+
+```{r}
+print("email@author.de")
+```
+
+## A: HTML Code chunk with a \<button onclick="function()" />
+
+> Note that the function is imported from a`.js` file in the document header
+
+> consider assinging a `id` (`label`?) to the code chunk and try to grab the `.cell-output code` by `#id`
+
+```{=html}
+<button onclick="copyToClipboard('.cell-output code')">Copy</button>
+```
+
+## B: raw HTML button (no chunk) + inline definition of copy function
+
+<button onclick="copyToClipboard('.cell-output code')">Copy</button>
+
+
+## C: recycling a OJS DOM generic
+
+> see [https://github.com/observablehq/inputs#Button](https://github.com/observablehq/inputs#Button)
+
+```{ojs}
+//| code-fold: true
+Inputs.button(
+  html`📧 <i>Copy</i>`,
+  {value: null, reduce:() => copyToClipboard('.cell-output code')}
+)
+```
+
+## D: same as C but function is defined in OJS chunk
+
+```{ojs}
+//| code-fold: false
+copyToClipboardB = function(domRef) {
+  // get DOM Element which contains the output
+  // i.e. ".cell-output code" to the first output chunk
+  const dom = document.querySelector(domRef);
+  // get the clean inner string of the DOM Element (no HTML)
+  const innerText = dom.innerText;
+  // with RegEx, remove [nr] and "
+  const cleanString = innerText.replace(/\[\d+]\s/, '').replace(/"/g, "")
+  // write to clipboard
+  navigator.clipboard.writeText(cleanString);
+  console.log(cleanString) // TODO: remove in production
+}
+```
+
+```{ojs}
+//| echo: false
+Inputs.button("Copy", {value: null, reduce:() => copyToClipboardB('.cell-output code') })
+```
+
+## E: using a OJS `html` template literal
+
+```{ojs}
+html`
+<button onclick="copyToClipboard('.cell-output code')">Copy</button>`
+```

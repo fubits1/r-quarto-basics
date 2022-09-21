@@ -1,0 +1,23 @@
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.mermaid {
+  text-align: center;
+}
+
+.mermaid.full-width svg {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+svg[class^='plot-'] {
+  width: 100%;
+}
+
+/* table head sort arrow spacing */
+table thead th span {
+  margin-right: 0.2rem;
+}

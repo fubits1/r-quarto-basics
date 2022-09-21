@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.251">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Observable Inputs.table from R data.frame / tibble</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="01-r-object-to-ojs-interface_files/libs/clipboard/clipboard.min.js"></script>
+<script src="01-r-object-to-ojs-interface_files/libs/quarto-html/quarto.js"></script>
+<script src="01-r-object-to-ojs-interface_files/libs/quarto-html/popper.min.js"></script>
+<script src="01-r-object-to-ojs-interface_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="01-r-object-to-ojs-interface_files/libs/quarto-html/anchor.min.js"></script>
+<link href="01-r-object-to-ojs-interface_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="01-r-object-to-ojs-interface_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="01-r-object-to-ojs-interface_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="01-r-object-to-ojs-interface_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="01-r-object-to-ojs-interface_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script type="module" src="01-r-object-to-ojs-interface_files/libs/quarto-ojs/quarto-ojs-runtime.js"></script>
+<link href="01-r-object-to-ojs-interface_files/libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
+<script type="ojs-define">
+{"contents":[{"name":"data_raw","value":[{"car":"Mazda RX4","mpg":21,"cyl":6,"disp":160,"hp":110,"drat":3.9,"wt":2.62,"qsec":16.46,"vs":0,"am":1,"gear":4,"carb":4},{"car":"Mazda RX4 Wag","mpg":21,"cyl":6,"disp":160,"hp":110,"drat":3.9,"wt":2.875,"qsec":17.02,"vs":0,"am":1,"gear":4,"carb":4},{"car":"Datsun 710","mpg":22.8,"cyl":4,"disp":108,"hp":93,"drat":3.85,"wt":2.32,"qsec":18.61,"vs":1,"am":1,"gear":4,"carb":1},{"car":"Hornet 4 Drive","mpg":21.4,"cyl":6,"disp":258,"hp":110,"drat":3.08,"wt":3.215,"qsec":19.44,"vs":1,"am":0,"gear":3,"carb":1},{"car":"Hornet Sportabout","mpg":18.7,"cyl":8,"disp":360,"hp":175,"drat":3.15,"wt":3.44,"qsec":17.02,"vs":0,"am":0,"gear":3,"carb":2},{"car":"Valiant","mpg":18.1,"cyl":6,"disp":225,"hp":105,"drat":2.76,"wt":3.46,"qsec":20.22,"vs":1,"am":0,"gear":3,"carb":1},{"car":"Duster 360","mpg":14.3,"cyl":8,"disp":360,"hp":245,"drat":3.21,"wt":3.57,"qsec":15.84,"vs":0,"am":0,"gear":3,"carb":4},{"car":"Merc 240D","mpg":24.4,"cyl":4,"disp":146.7,"hp":62,"drat":3.69,"wt":3.19,"qsec":20,"vs":1,"am":0,"gear":4,"carb":2},{"car":"Merc 230","mpg":22.8,"cyl":4,"disp":140.8,"hp":95,"drat":3.92,"wt":3.15,"qsec":22.9,"vs":1,"am":0,"gear":4,"carb":2},{"car":"Merc 280","mpg":19.2,"cyl":6,"disp":167.6,"hp":123,"drat":3.92,"wt":3.44,"qsec":18.3,"vs":1,"am":0,"gear":4,"carb":4},{"car":"Merc 280C","mpg":17.8,"cyl":6,"disp":167.6,"hp":123,"drat":3.92,"wt":3.44,"qsec":18.9,"vs":1,"am":0,"gear":4,"carb":4},{"car":"Merc 450SE","mpg":16.4,"cyl":8,"disp":275.8,"hp":180,"drat":3.07,"wt":4.07,"qsec":17.4,"vs":0,"am":0,"gear":3,"carb":3},{"car":"Merc 450SL","mpg":17.3,"cyl":8,"disp":275.8,"hp":180,"drat":3.07,"wt":3.73,"qsec":17.6,"vs":0,"am":0,"gear":3,"carb":3},{"car":"Merc 450SLC","mpg":15.2,"cyl":8,"disp":275.8,"hp":180,"drat":3.07,"wt":3.78,"qsec":18,"vs":0,"am":0,"gear":3,"carb":3},{"car":"Cadillac Fleetwood","mpg":10.4,"cyl":8,"disp":472,"hp":205,"drat":2.93,"wt":5.25,"qsec":17.98,"vs":0,"am":0,"gear":3,"carb":4},{"car":"Lincoln Continental","mpg":10.4,"cyl":8,"disp":460,"hp":215,"drat":3,"wt":5.424,"qsec":17.82,"vs":0,"am":0,"gear":3,"carb":4},{"car":"Chrysler Imperial","mpg":14.7,"cyl":8,"disp":440,"hp":230,"drat":3.23,"wt":5.345,"qsec":17.42,"vs":0,"am":0,"gear":3,"carb":4},{"car":"Fiat 128","mpg":32.4,"cyl":4,"disp":78.7,"hp":66,"drat":4.08,"wt":2.2,"qsec":19.47,"vs":1,"am":1,"gear":4,"carb":1},{"car":"Honda Civic","mpg":30.4,"cyl":4,"disp":75.7,"hp":52,"drat":4.93,"wt":1.615,"qsec":18.52,"vs":1,"am":1,"gear":4,"carb":2},{"car":"Toyota Corolla","mpg":33.9,"cyl":4,"disp":71.1,"hp":65,"drat":4.22,"wt":1.835,"qsec":19.9,"vs":1,"am":1,"gear":4,"carb":1},{"car":"Toyota Corona","mpg":21.5,"cyl":4,"disp":120.1,"hp":97,"drat":3.7,"wt":2.465,"qsec":20.01,"vs":1,"am":0,"gear":3,"carb":1},{"car":"Dodge Challenger","mpg":15.5,"cyl":8,"disp":318,"hp":150,"drat":2.76,"wt":3.52,"qsec":16.87,"vs":0,"am":0,"gear":3,"carb":2},{"car":"AMC Javelin","mpg":15.2,"cyl":8,"disp":304,"hp":150,"drat":3.15,"wt":3.435,"qsec":17.3,"vs":0,"am":0,"gear":3,"carb":2},{"car":"Camaro Z28","mpg":13.3,"cyl":8,"disp":350,"hp":245,"drat":3.73,"wt":3.84,"qsec":15.41,"vs":0,"am":0,"gear":3,"carb":4},{"car":"Pontiac Firebird","mpg":19.2,"cyl":8,"disp":400,"hp":175,"drat":3.08,"wt":3.845,"qsec":17.05,"vs":0,"am":0,"gear":3,"carb":2},{"car":"Fiat X1-9","mpg":27.3,"cyl":4,"disp":79,"hp":66,"drat":4.08,"wt":1.935,"qsec":18.9,"vs":1,"am":1,"gear":4,"carb":1},{"car":"Porsche 914-2","mpg":26,"cyl":4,"disp":120.3,"hp":91,"drat":4.43,"wt":2.14,"qsec":16.7,"vs":0,"am":1,"gear":5,"carb":2},{"car":"Lotus Europa","mpg":30.4,"cyl":4,"disp":95.1,"hp":113,"drat":3.77,"wt":1.513,"qsec":16.9,"vs":1,"am":1,"gear":5,"carb":2},{"car":"Ford Pantera L","mpg":15.8,"cyl":8,"disp":351,"hp":264,"drat":4.22,"wt":3.17,"qsec":14.5,"vs":0,"am":1,"gear":5,"carb":4},{"car":"Ferrari Dino","mpg":19.7,"cyl":6,"disp":145,"hp":175,"drat":3.62,"wt":2.77,"qsec":15.5,"vs":0,"am":1,"gear":5,"carb":6},{"car":"Maserati Bora","mpg":15,"cyl":8,"disp":301,"hp":335,"drat":3.54,"wt":3.57,"qsec":14.6,"vs":0,"am":1,"gear":5,"carb":8},{"car":"Volvo 142E","mpg":21.4,"cyl":4,"disp":121,"hp":109,"drat":4.11,"wt":2.78,"qsec":18.6,"vs":1,"am":1,"gear":4,"carb":2}]}]}
+</script>
+<script type="ojs-define">
+{"contents":[{"name":"min","value":52}]}
+</script>
+<script type="ojs-define">
+{"contents":[{"name":"max","value":335}]}
+</script>
+
+
+<link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">TOC</h2>
+   
+  <ul>
+  <li><a href="#demo" id="toc-demo" class="nav-link active" data-scroll-target="#demo">Demo</a></li>
+  <li><a href="#r-ggplot-toy" id="toc-r-ggplot-toy" class="nav-link" data-scroll-target="#r-ggplot-toy">R: ggplot toy</a></li>
+  <li><a href="#transpose-r-data-object" id="toc-transpose-r-data-object" class="nav-link" data-scroll-target="#transpose-r-data-object">Transpose R data object</a></li>
+  <li><a href="#expose-to-js" id="toc-expose-to-js" class="nav-link" data-scroll-target="#expose-to-js">Expose to JS</a></li>
+  <li><a href="#js-table-from-r-data" id="toc-js-table-from-r-data" class="nav-link" data-scroll-target="#js-table-from-r-data">JS Table from R data</a>
+  <ul class="collapse">
+  <li><a href="#bonus-mean-hp-from-seleted-rows" id="toc-bonus-mean-hp-from-seleted-rows" class="nav-link" data-scroll-target="#bonus-mean-hp-from-seleted-rows">Bonus: Mean HP from seleted rows</a></li>
+  </ul></li>
+  <li><a href="#plot" id="toc-plot" class="nav-link" data-scroll-target="#plot">Plot</a>
+  <ul class="collapse">
+  <li><a href="#minmax-hp-with-r" id="toc-minmax-hp-with-r" class="nav-link" data-scroll-target="#minmax-hp-with-r">min/max hp with R</a></li>
+  </ul></li>
+  <li><a href="#helper-functions" id="toc-helper-functions" class="nav-link" data-scroll-target="#helper-functions">Helper Functions</a>
+  <ul class="collapse">
+  <li><a href="#sparkline-for-table" id="toc-sparkline-for-table" class="nav-link" data-scroll-target="#sparkline-for-table">Sparkline for table</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Observable Inputs.table from R data.frame / tibble</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<section id="demo" class="level1">
+<h1>Demo</h1>
+<blockquote class="blockquote">
+<p>fdfd</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="r-ggplot-toy" class="level1">
+<h1>R: ggplot toy</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(mpg, <span class="fu">aes</span>(<span class="at">x =</span> hwy, <span class="at">y =</span> cty, <span class="at">color =</span> cyl)) <span class="sc">+</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>() <span class="sc">+</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="01-r-object-to-ojs-interface_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="transpose-r-data-object" class="level1">
+<h1>Transpose R data object</h1>
+<blockquote class="blockquote">
+<p>R df / tibble needs to be transposed for Observable’s Inputs.table<br>
+Inputs.table needs an Array of Objects to iterate over</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Consider turning this into a function<br>
+Consider how to account for potential row names</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>data_raw <span class="ot">&lt;-</span> mtcars <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"car"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># tibble() %&gt;%</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transpose</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">base mtcars</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">transposed</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Bonus: tibble</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "list"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "data.frame"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   32 obs. of  11 variables:
+ $ mpg : num  21 21 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 ...
+ $ cyl : num  6 6 4 6 8 6 8 4 4 6 ...
+ $ disp: num  160 160 108 258 360 ...
+ $ hp  : num  110 110 93 110 175 105 245 62 95 123 ...
+ $ drat: num  3.9 3.9 3.85 3.08 3.15 2.76 3.21 3.69 3.92 3.92 ...
+ $ wt  : num  2.62 2.88 2.32 3.21 3.44 ...
+ $ qsec: num  16.5 17 18.6 19.4 17 ...
+ $ vs  : num  0 0 1 1 0 1 0 1 1 1 ...
+ $ am  : num  1 1 1 0 0 0 0 0 0 0 ...
+ $ gear: num  4 4 4 3 3 3 3 4 4 4 ...
+ $ carb: num  4 4 1 1 2 1 4 2 2 4 ...</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(data_raw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "list"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(data_raw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "list"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(data_raw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>List of 32
+ $ :List of 12
+  ..$ car : chr "Mazda RX4"
+  ..$ mpg : num 21
+  ..$ cyl : num 6
+  ..$ disp: num 160
+  ..$ hp  : num 110
+  ..$ drat: num 3.9
+  ..$ wt  : num 2.62
+  ..$ qsec: num 16.5
+  ..$ vs  : num 0
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Mazda RX4 Wag"
+  ..$ mpg : num 21
+  ..$ cyl : num 6
+  ..$ disp: num 160
+  ..$ hp  : num 110
+  ..$ drat: num 3.9
+  ..$ wt  : num 2.88
+  ..$ qsec: num 17
+  ..$ vs  : num 0
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Datsun 710"
+  ..$ mpg : num 22.8
+  ..$ cyl : num 4
+  ..$ disp: num 108
+  ..$ hp  : num 93
+  ..$ drat: num 3.85
+  ..$ wt  : num 2.32
+  ..$ qsec: num 18.6
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Hornet 4 Drive"
+  ..$ mpg : num 21.4
+  ..$ cyl : num 6
+  ..$ disp: num 258
+  ..$ hp  : num 110
+  ..$ drat: num 3.08
+  ..$ wt  : num 3.21
+  ..$ qsec: num 19.4
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Hornet Sportabout"
+  ..$ mpg : num 18.7
+  ..$ cyl : num 8
+  ..$ disp: num 360
+  ..$ hp  : num 175
+  ..$ drat: num 3.15
+  ..$ wt  : num 3.44
+  ..$ qsec: num 17
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Valiant"
+  ..$ mpg : num 18.1
+  ..$ cyl : num 6
+  ..$ disp: num 225
+  ..$ hp  : num 105
+  ..$ drat: num 2.76
+  ..$ wt  : num 3.46
+  ..$ qsec: num 20.2
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Duster 360"
+  ..$ mpg : num 14.3
+  ..$ cyl : num 8
+  ..$ disp: num 360
+  ..$ hp  : num 245
+  ..$ drat: num 3.21
+  ..$ wt  : num 3.57
+  ..$ qsec: num 15.8
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Merc 240D"
+  ..$ mpg : num 24.4
+  ..$ cyl : num 4
+  ..$ disp: num 147
+  ..$ hp  : num 62
+  ..$ drat: num 3.69
+  ..$ wt  : num 3.19
+  ..$ qsec: num 20
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 4
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Merc 230"
+  ..$ mpg : num 22.8
+  ..$ cyl : num 4
+  ..$ disp: num 141
+  ..$ hp  : num 95
+  ..$ drat: num 3.92
+  ..$ wt  : num 3.15
+  ..$ qsec: num 22.9
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 4
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Merc 280"
+  ..$ mpg : num 19.2
+  ..$ cyl : num 6
+  ..$ disp: num 168
+  ..$ hp  : num 123
+  ..$ drat: num 3.92
+  ..$ wt  : num 3.44
+  ..$ qsec: num 18.3
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 4
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Merc 280C"
+  ..$ mpg : num 17.8
+  ..$ cyl : num 6
+  ..$ disp: num 168
+  ..$ hp  : num 123
+  ..$ drat: num 3.92
+  ..$ wt  : num 3.44
+  ..$ qsec: num 18.9
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 4
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Merc 450SE"
+  ..$ mpg : num 16.4
+  ..$ cyl : num 8
+  ..$ disp: num 276
+  ..$ hp  : num 180
+  ..$ drat: num 3.07
+  ..$ wt  : num 4.07
+  ..$ qsec: num 17.4
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 3
+ $ :List of 12
+  ..$ car : chr "Merc 450SL"
+  ..$ mpg : num 17.3
+  ..$ cyl : num 8
+  ..$ disp: num 276
+  ..$ hp  : num 180
+  ..$ drat: num 3.07
+  ..$ wt  : num 3.73
+  ..$ qsec: num 17.6
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 3
+ $ :List of 12
+  ..$ car : chr "Merc 450SLC"
+  ..$ mpg : num 15.2
+  ..$ cyl : num 8
+  ..$ disp: num 276
+  ..$ hp  : num 180
+  ..$ drat: num 3.07
+  ..$ wt  : num 3.78
+  ..$ qsec: num 18
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 3
+ $ :List of 12
+  ..$ car : chr "Cadillac Fleetwood"
+  ..$ mpg : num 10.4
+  ..$ cyl : num 8
+  ..$ disp: num 472
+  ..$ hp  : num 205
+  ..$ drat: num 2.93
+  ..$ wt  : num 5.25
+  ..$ qsec: num 18
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Lincoln Continental"
+  ..$ mpg : num 10.4
+  ..$ cyl : num 8
+  ..$ disp: num 460
+  ..$ hp  : num 215
+  ..$ drat: num 3
+  ..$ wt  : num 5.42
+  ..$ qsec: num 17.8
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Chrysler Imperial"
+  ..$ mpg : num 14.7
+  ..$ cyl : num 8
+  ..$ disp: num 440
+  ..$ hp  : num 230
+  ..$ drat: num 3.23
+  ..$ wt  : num 5.34
+  ..$ qsec: num 17.4
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Fiat 128"
+  ..$ mpg : num 32.4
+  ..$ cyl : num 4
+  ..$ disp: num 78.7
+  ..$ hp  : num 66
+  ..$ drat: num 4.08
+  ..$ wt  : num 2.2
+  ..$ qsec: num 19.5
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Honda Civic"
+  ..$ mpg : num 30.4
+  ..$ cyl : num 4
+  ..$ disp: num 75.7
+  ..$ hp  : num 52
+  ..$ drat: num 4.93
+  ..$ wt  : num 1.61
+  ..$ qsec: num 18.5
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Toyota Corolla"
+  ..$ mpg : num 33.9
+  ..$ cyl : num 4
+  ..$ disp: num 71.1
+  ..$ hp  : num 65
+  ..$ drat: num 4.22
+  ..$ wt  : num 1.83
+  ..$ qsec: num 19.9
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Toyota Corona"
+  ..$ mpg : num 21.5
+  ..$ cyl : num 4
+  ..$ disp: num 120
+  ..$ hp  : num 97
+  ..$ drat: num 3.7
+  ..$ wt  : num 2.46
+  ..$ qsec: num 20
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Dodge Challenger"
+  ..$ mpg : num 15.5
+  ..$ cyl : num 8
+  ..$ disp: num 318
+  ..$ hp  : num 150
+  ..$ drat: num 2.76
+  ..$ wt  : num 3.52
+  ..$ qsec: num 16.9
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "AMC Javelin"
+  ..$ mpg : num 15.2
+  ..$ cyl : num 8
+  ..$ disp: num 304
+  ..$ hp  : num 150
+  ..$ drat: num 3.15
+  ..$ wt  : num 3.44
+  ..$ qsec: num 17.3
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Camaro Z28"
+  ..$ mpg : num 13.3
+  ..$ cyl : num 8
+  ..$ disp: num 350
+  ..$ hp  : num 245
+  ..$ drat: num 3.73
+  ..$ wt  : num 3.84
+  ..$ qsec: num 15.4
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Pontiac Firebird"
+  ..$ mpg : num 19.2
+  ..$ cyl : num 8
+  ..$ disp: num 400
+  ..$ hp  : num 175
+  ..$ drat: num 3.08
+  ..$ wt  : num 3.85
+  ..$ qsec: num 17.1
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Fiat X1-9"
+  ..$ mpg : num 27.3
+  ..$ cyl : num 4
+  ..$ disp: num 79
+  ..$ hp  : num 66
+  ..$ drat: num 4.08
+  ..$ wt  : num 1.94
+  ..$ qsec: num 18.9
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Porsche 914-2"
+  ..$ mpg : num 26
+  ..$ cyl : num 4
+  ..$ disp: num 120
+  ..$ hp  : num 91
+  ..$ drat: num 4.43
+  ..$ wt  : num 2.14
+  ..$ qsec: num 16.7
+  ..$ vs  : num 0
+  ..$ am  : num 1
+  ..$ gear: num 5
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Lotus Europa"
+  ..$ mpg : num 30.4
+  ..$ cyl : num 4
+  ..$ disp: num 95.1
+  ..$ hp  : num 113
+  ..$ drat: num 3.77
+  ..$ wt  : num 1.51
+  ..$ qsec: num 16.9
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 5
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Ford Pantera L"
+  ..$ mpg : num 15.8
+  ..$ cyl : num 8
+  ..$ disp: num 351
+  ..$ hp  : num 264
+  ..$ drat: num 4.22
+  ..$ wt  : num 3.17
+  ..$ qsec: num 14.5
+  ..$ vs  : num 0
+  ..$ am  : num 1
+  ..$ gear: num 5
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Ferrari Dino"
+  ..$ mpg : num 19.7
+  ..$ cyl : num 6
+  ..$ disp: num 145
+  ..$ hp  : num 175
+  ..$ drat: num 3.62
+  ..$ wt  : num 2.77
+  ..$ qsec: num 15.5
+  ..$ vs  : num 0
+  ..$ am  : num 1
+  ..$ gear: num 5
+  ..$ carb: num 6
+ $ :List of 12
+  ..$ car : chr "Maserati Bora"
+  ..$ mpg : num 15
+  ..$ cyl : num 8
+  ..$ disp: num 301
+  ..$ hp  : num 335
+  ..$ drat: num 3.54
+  ..$ wt  : num 3.57
+  ..$ qsec: num 14.6
+  ..$ vs  : num 0
+  ..$ am  : num 1
+  ..$ gear: num 5
+  ..$ carb: num 8
+ $ :List of 12
+  ..$ car : chr "Volvo 142E"
+  ..$ mpg : num 21.4
+  ..$ cyl : num 4
+  ..$ disp: num 121
+  ..$ hp  : num 109
+  ..$ drat: num 4.11
+  ..$ wt  : num 2.78
+  ..$ qsec: num 18.6
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 2</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="fu">tibble</span>(mtcars))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "list"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(<span class="fu">tibble</span>(mtcars))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "tbl_df"     "tbl"        "data.frame"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(data_raw_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>List of 32
+ $ :List of 12
+  ..$ car : chr "Mazda RX4"
+  ..$ mpg : num 21
+  ..$ cyl : num 6
+  ..$ disp: num 160
+  ..$ hp  : num 110
+  ..$ drat: num 3.9
+  ..$ wt  : num 2.62
+  ..$ qsec: num 16.5
+  ..$ vs  : num 0
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Mazda RX4 Wag"
+  ..$ mpg : num 21
+  ..$ cyl : num 6
+  ..$ disp: num 160
+  ..$ hp  : num 110
+  ..$ drat: num 3.9
+  ..$ wt  : num 2.88
+  ..$ qsec: num 17
+  ..$ vs  : num 0
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Datsun 710"
+  ..$ mpg : num 22.8
+  ..$ cyl : num 4
+  ..$ disp: num 108
+  ..$ hp  : num 93
+  ..$ drat: num 3.85
+  ..$ wt  : num 2.32
+  ..$ qsec: num 18.6
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Hornet 4 Drive"
+  ..$ mpg : num 21.4
+  ..$ cyl : num 6
+  ..$ disp: num 258
+  ..$ hp  : num 110
+  ..$ drat: num 3.08
+  ..$ wt  : num 3.21
+  ..$ qsec: num 19.4
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Hornet Sportabout"
+  ..$ mpg : num 18.7
+  ..$ cyl : num 8
+  ..$ disp: num 360
+  ..$ hp  : num 175
+  ..$ drat: num 3.15
+  ..$ wt  : num 3.44
+  ..$ qsec: num 17
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Valiant"
+  ..$ mpg : num 18.1
+  ..$ cyl : num 6
+  ..$ disp: num 225
+  ..$ hp  : num 105
+  ..$ drat: num 2.76
+  ..$ wt  : num 3.46
+  ..$ qsec: num 20.2
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Duster 360"
+  ..$ mpg : num 14.3
+  ..$ cyl : num 8
+  ..$ disp: num 360
+  ..$ hp  : num 245
+  ..$ drat: num 3.21
+  ..$ wt  : num 3.57
+  ..$ qsec: num 15.8
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Merc 240D"
+  ..$ mpg : num 24.4
+  ..$ cyl : num 4
+  ..$ disp: num 147
+  ..$ hp  : num 62
+  ..$ drat: num 3.69
+  ..$ wt  : num 3.19
+  ..$ qsec: num 20
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 4
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Merc 230"
+  ..$ mpg : num 22.8
+  ..$ cyl : num 4
+  ..$ disp: num 141
+  ..$ hp  : num 95
+  ..$ drat: num 3.92
+  ..$ wt  : num 3.15
+  ..$ qsec: num 22.9
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 4
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Merc 280"
+  ..$ mpg : num 19.2
+  ..$ cyl : num 6
+  ..$ disp: num 168
+  ..$ hp  : num 123
+  ..$ drat: num 3.92
+  ..$ wt  : num 3.44
+  ..$ qsec: num 18.3
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 4
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Merc 280C"
+  ..$ mpg : num 17.8
+  ..$ cyl : num 6
+  ..$ disp: num 168
+  ..$ hp  : num 123
+  ..$ drat: num 3.92
+  ..$ wt  : num 3.44
+  ..$ qsec: num 18.9
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 4
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Merc 450SE"
+  ..$ mpg : num 16.4
+  ..$ cyl : num 8
+  ..$ disp: num 276
+  ..$ hp  : num 180
+  ..$ drat: num 3.07
+  ..$ wt  : num 4.07
+  ..$ qsec: num 17.4
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 3
+ $ :List of 12
+  ..$ car : chr "Merc 450SL"
+  ..$ mpg : num 17.3
+  ..$ cyl : num 8
+  ..$ disp: num 276
+  ..$ hp  : num 180
+  ..$ drat: num 3.07
+  ..$ wt  : num 3.73
+  ..$ qsec: num 17.6
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 3
+ $ :List of 12
+  ..$ car : chr "Merc 450SLC"
+  ..$ mpg : num 15.2
+  ..$ cyl : num 8
+  ..$ disp: num 276
+  ..$ hp  : num 180
+  ..$ drat: num 3.07
+  ..$ wt  : num 3.78
+  ..$ qsec: num 18
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 3
+ $ :List of 12
+  ..$ car : chr "Cadillac Fleetwood"
+  ..$ mpg : num 10.4
+  ..$ cyl : num 8
+  ..$ disp: num 472
+  ..$ hp  : num 205
+  ..$ drat: num 2.93
+  ..$ wt  : num 5.25
+  ..$ qsec: num 18
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Lincoln Continental"
+  ..$ mpg : num 10.4
+  ..$ cyl : num 8
+  ..$ disp: num 460
+  ..$ hp  : num 215
+  ..$ drat: num 3
+  ..$ wt  : num 5.42
+  ..$ qsec: num 17.8
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Chrysler Imperial"
+  ..$ mpg : num 14.7
+  ..$ cyl : num 8
+  ..$ disp: num 440
+  ..$ hp  : num 230
+  ..$ drat: num 3.23
+  ..$ wt  : num 5.34
+  ..$ qsec: num 17.4
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Fiat 128"
+  ..$ mpg : num 32.4
+  ..$ cyl : num 4
+  ..$ disp: num 78.7
+  ..$ hp  : num 66
+  ..$ drat: num 4.08
+  ..$ wt  : num 2.2
+  ..$ qsec: num 19.5
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Honda Civic"
+  ..$ mpg : num 30.4
+  ..$ cyl : num 4
+  ..$ disp: num 75.7
+  ..$ hp  : num 52
+  ..$ drat: num 4.93
+  ..$ wt  : num 1.61
+  ..$ qsec: num 18.5
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Toyota Corolla"
+  ..$ mpg : num 33.9
+  ..$ cyl : num 4
+  ..$ disp: num 71.1
+  ..$ hp  : num 65
+  ..$ drat: num 4.22
+  ..$ wt  : num 1.83
+  ..$ qsec: num 19.9
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Toyota Corona"
+  ..$ mpg : num 21.5
+  ..$ cyl : num 4
+  ..$ disp: num 120
+  ..$ hp  : num 97
+  ..$ drat: num 3.7
+  ..$ wt  : num 2.46
+  ..$ qsec: num 20
+  ..$ vs  : num 1
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Dodge Challenger"
+  ..$ mpg : num 15.5
+  ..$ cyl : num 8
+  ..$ disp: num 318
+  ..$ hp  : num 150
+  ..$ drat: num 2.76
+  ..$ wt  : num 3.52
+  ..$ qsec: num 16.9
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "AMC Javelin"
+  ..$ mpg : num 15.2
+  ..$ cyl : num 8
+  ..$ disp: num 304
+  ..$ hp  : num 150
+  ..$ drat: num 3.15
+  ..$ wt  : num 3.44
+  ..$ qsec: num 17.3
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Camaro Z28"
+  ..$ mpg : num 13.3
+  ..$ cyl : num 8
+  ..$ disp: num 350
+  ..$ hp  : num 245
+  ..$ drat: num 3.73
+  ..$ wt  : num 3.84
+  ..$ qsec: num 15.4
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Pontiac Firebird"
+  ..$ mpg : num 19.2
+  ..$ cyl : num 8
+  ..$ disp: num 400
+  ..$ hp  : num 175
+  ..$ drat: num 3.08
+  ..$ wt  : num 3.85
+  ..$ qsec: num 17.1
+  ..$ vs  : num 0
+  ..$ am  : num 0
+  ..$ gear: num 3
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Fiat X1-9"
+  ..$ mpg : num 27.3
+  ..$ cyl : num 4
+  ..$ disp: num 79
+  ..$ hp  : num 66
+  ..$ drat: num 4.08
+  ..$ wt  : num 1.94
+  ..$ qsec: num 18.9
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 1
+ $ :List of 12
+  ..$ car : chr "Porsche 914-2"
+  ..$ mpg : num 26
+  ..$ cyl : num 4
+  ..$ disp: num 120
+  ..$ hp  : num 91
+  ..$ drat: num 4.43
+  ..$ wt  : num 2.14
+  ..$ qsec: num 16.7
+  ..$ vs  : num 0
+  ..$ am  : num 1
+  ..$ gear: num 5
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Lotus Europa"
+  ..$ mpg : num 30.4
+  ..$ cyl : num 4
+  ..$ disp: num 95.1
+  ..$ hp  : num 113
+  ..$ drat: num 3.77
+  ..$ wt  : num 1.51
+  ..$ qsec: num 16.9
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 5
+  ..$ carb: num 2
+ $ :List of 12
+  ..$ car : chr "Ford Pantera L"
+  ..$ mpg : num 15.8
+  ..$ cyl : num 8
+  ..$ disp: num 351
+  ..$ hp  : num 264
+  ..$ drat: num 4.22
+  ..$ wt  : num 3.17
+  ..$ qsec: num 14.5
+  ..$ vs  : num 0
+  ..$ am  : num 1
+  ..$ gear: num 5
+  ..$ carb: num 4
+ $ :List of 12
+  ..$ car : chr "Ferrari Dino"
+  ..$ mpg : num 19.7
+  ..$ cyl : num 6
+  ..$ disp: num 145
+  ..$ hp  : num 175
+  ..$ drat: num 3.62
+  ..$ wt  : num 2.77
+  ..$ qsec: num 15.5
+  ..$ vs  : num 0
+  ..$ am  : num 1
+  ..$ gear: num 5
+  ..$ carb: num 6
+ $ :List of 12
+  ..$ car : chr "Maserati Bora"
+  ..$ mpg : num 15
+  ..$ cyl : num 8
+  ..$ disp: num 301
+  ..$ hp  : num 335
+  ..$ drat: num 3.54
+  ..$ wt  : num 3.57
+  ..$ qsec: num 14.6
+  ..$ vs  : num 0
+  ..$ am  : num 1
+  ..$ gear: num 5
+  ..$ carb: num 8
+ $ :List of 12
+  ..$ car : chr "Volvo 142E"
+  ..$ mpg : num 21.4
+  ..$ cyl : num 4
+  ..$ disp: num 121
+  ..$ hp  : num 109
+  ..$ drat: num 4.11
+  ..$ wt  : num 2.78
+  ..$ qsec: num 18.6
+  ..$ vs  : num 1
+  ..$ am  : num 1
+  ..$ gear: num 4
+  ..$ carb: num 2</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="expose-to-js" class="level1">
+<h1>Expose to JS</h1>
+<div class="callout-warning callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Caution: <code>ojs_define</code> is
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>
+not available as an executable chunk from within the <code>.qmd</code> document
+</li>
+<li>
+exposes the object / data in the client (search for <code>&lt;script type="ojs-define"&gt;</code> in the DOM tree)
+</li>
+</ul>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ojs_define</span>(data_raw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="js-table-from-r-data" class="level1">
+<h1>JS Table from R data</h1>
+<blockquote class="blockquote">
+<p>dropdown with var names for dynamic sorting<br>
+pre-pending <code>null</code> to allow no choice as inital value</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23" data-startfrom="121" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 120;"><span id="cb23-121"><a href="#cb23-121" aria-hidden="true" tabindex="-1"></a>viewof dropdown <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">select</span>([<span class="kw">null</span>]<span class="op">.</span><span class="fu">concat</span>(<span class="bu">Object</span><span class="op">.</span><span class="fu">keys</span>(data_raw[<span class="dv">0</span>])<span class="op">.</span><span class="fu">sort</span>())<span class="op">,</span></span>
+<span id="cb23-122"><a href="#cb23-122" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">value</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Sort by"</span><span class="op">,</span> </span>
+<span id="cb23-123"><a href="#cb23-123" aria-hidden="true" tabindex="-1"></a>  <span class="op">&lt;!--</span> <span class="dt">sort</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span>  <span class="co">// or sort: "car"--&gt;</span></span>
+<span id="cb23-124"><a href="#cb23-124" aria-hidden="true" tabindex="-1"></a>  <span class="dt">unique</span><span class="op">:</span> <span class="kw">true</span>}</span>
+<span id="cb23-125"><a href="#cb23-125" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24" data-startfrom="129" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 128;"><span id="cb24-129"><a href="#cb24-129" aria-hidden="true" tabindex="-1"></a>viewof tableData <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">table</span>(data_raw<span class="op">,</span></span>
+<span id="cb24-130"><a href="#cb24-130" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">sort</span><span class="op">:</span> dropdown<span class="op">,</span> <span class="dt">required</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb24-131"><a href="#cb24-131" aria-hidden="true" tabindex="-1"></a>    <span class="dt">format</span><span class="op">:</span> {</span>
+<span id="cb24-132"><a href="#cb24-132" aria-hidden="true" tabindex="-1"></a>      <span class="dt">mpg</span><span class="op">:</span> <span class="fu">sparkbar</span>(d3<span class="op">.</span><span class="fu">max</span>(data_raw<span class="op">,</span> d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">mpg</span>))<span class="op">,</span></span>
+<span id="cb24-133"><a href="#cb24-133" aria-hidden="true" tabindex="-1"></a>      <span class="dt">cyl</span><span class="op">:</span> <span class="fu">sparkbar</span>(d3<span class="op">.</span><span class="fu">max</span>(data_raw<span class="op">,</span> d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">cyl</span>))<span class="op">,</span></span>
+<span id="cb24-134"><a href="#cb24-134" aria-hidden="true" tabindex="-1"></a>      <span class="dt">disp</span><span class="op">:</span> <span class="fu">sparkbar</span>(d3<span class="op">.</span><span class="fu">max</span>(data_raw<span class="op">,</span> d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">disp</span>))<span class="op">,</span></span>
+<span id="cb24-135"><a href="#cb24-135" aria-hidden="true" tabindex="-1"></a>      <span class="dt">hp</span><span class="op">:</span> <span class="fu">sparkbar</span>(d3<span class="op">.</span><span class="fu">max</span>(data_raw<span class="op">,</span> d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">hp</span>))<span class="op">,</span></span>
+<span id="cb24-136"><a href="#cb24-136" aria-hidden="true" tabindex="-1"></a>      <span class="dt">qsec</span><span class="op">:</span> <span class="fu">sparkbar</span>(d3<span class="op">.</span><span class="fu">max</span>(data_raw<span class="op">,</span> d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">qsec</span>))</span>
+<span id="cb24-137"><a href="#cb24-137" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb24-138"><a href="#cb24-138" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb24-139"><a href="#cb24-139" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25" data-startfrom="143" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 142;"><span id="cb25-143"><a href="#cb25-143" aria-hidden="true" tabindex="-1"></a>tableData</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-3" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<section id="bonus-mean-hp-from-seleted-rows" class="level3">
+<h3 class="anchored" data-anchor-id="bonus-mean-hp-from-seleted-rows">Bonus: Mean HP from seleted rows</h3>
+<div class="cell">
+<div class="sourceCode cell-code hidden" id="cb26" data-startfrom="150" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 149;"><span id="cb26-150"><a href="#cb26-150" aria-hidden="true" tabindex="-1"></a><span class="fu">html</span><span class="vs">`Mean HP: </span><span class="sc">${</span>(tableData<span class="op">.</span><span class="fu">reduce</span>((a<span class="op">,</span>b) <span class="kw">=&gt;</span> a <span class="op">+</span> b<span class="op">.</span><span class="at">hp</span><span class="op">,</span> <span class="dv">0</span>) <span class="op">/</span> tableData<span class="op">.</span><span class="at">length</span>) <span class="op">||</span> <span class="st">"none selected"</span> <span class="sc">}</span><span class="vs">`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-4" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="plot" class="level1">
+<h1>Plot</h1>
+<section id="minmax-hp-with-r" class="level2">
+<h2 class="anchored" data-anchor-id="minmax-hp-with-r">min/max hp with R</h2>
+<blockquote class="blockquote">
+<p>Just a proof-of-concept; can be solved with ojs Plot generics</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>min <span class="ot">&lt;-</span> <span class="fu">min</span>(mtcars<span class="sc">$</span>hp)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>max <span class="ot">&lt;-</span> <span class="fu">max</span>(mtcars<span class="sc">$</span>hp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ojs_define</span>(min)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ojs_define</span>(max)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29" data-startfrom="170" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 169;"><span id="cb29-170"><a href="#cb29-170" aria-hidden="true" tabindex="-1"></a>chart <span class="op">=</span> Plot<span class="op">.</span><span class="fu">plot</span>({</span>
+<span id="cb29-171"><a href="#cb29-171" aria-hidden="true" tabindex="-1"></a>  <span class="dt">inset</span><span class="op">:</span> <span class="dv">8</span><span class="op">,</span></span>
+<span id="cb29-172"><a href="#cb29-172" aria-hidden="true" tabindex="-1"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb29-173"><a href="#cb29-173" aria-hidden="true" tabindex="-1"></a>  <span class="dt">facet</span><span class="op">:</span> {</span>
+<span id="cb29-174"><a href="#cb29-174" aria-hidden="true" tabindex="-1"></a>    <span class="dt">data</span><span class="op">:</span> data_raw<span class="op">,</span></span>
+<span id="cb29-175"><a href="#cb29-175" aria-hidden="true" tabindex="-1"></a>    <span class="dt">y</span><span class="op">:</span> doFacet <span class="op">&amp;&amp;</span> <span class="st">"cyl"</span></span>
+<span id="cb29-176"><a href="#cb29-176" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb29-177"><a href="#cb29-177" aria-hidden="true" tabindex="-1"></a>  <span class="dt">color</span><span class="op">:</span> {</span>
+<span id="cb29-178"><a href="#cb29-178" aria-hidden="true" tabindex="-1"></a>    <span class="dt">legend</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb29-179"><a href="#cb29-179" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb29-180"><a href="#cb29-180" aria-hidden="true" tabindex="-1"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
+<span id="cb29-181"><a href="#cb29-181" aria-hidden="true" tabindex="-1"></a>    Plot<span class="op">.</span><span class="fu">dot</span>(data_raw<span class="op">,</span>{<span class="dt">filter</span><span class="op">:</span> d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">hp</span> <span class="op">&lt;=</span> minimum<span class="op">,</span> <span class="dt">x</span><span class="op">:</span> <span class="st">"cyl"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"mpg"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"car"</span>})</span>
+<span id="cb29-182"><a href="#cb29-182" aria-hidden="true" tabindex="-1"></a>  ]</span>
+<span id="cb29-183"><a href="#cb29-183" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30" data-startfrom="188" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 187;"><span id="cb30-188"><a href="#cb30-188" aria-hidden="true" tabindex="-1"></a>viewof minimum <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">range</span>([min<span class="op">,</span> max]<span class="op">,</span> { <span class="dt">value</span><span class="op">:</span> max<span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"hp filter"</span> })</span>
+<span id="cb30-189"><a href="#cb30-189" aria-hidden="true" tabindex="-1"></a>viewof doFacet <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">toggle</span>({<span class="dt">label</span><span class="op">:</span> <span class="st">"Facet"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="kw">true</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31" data-startfrom="192" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 191;"><span id="cb31-192"><a href="#cb31-192" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> {serialize} <span class="im">from</span> <span class="st">"@mbostock/saving-svg"</span></span>
+<span id="cb31-193"><a href="#cb31-193" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;!--</span> rasterize <span class="op">--&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-7" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32" data-startfrom="197" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 196;"><span id="cb32-197"><a href="#cb32-197" aria-hidden="true" tabindex="-1"></a>DOM<span class="op">.</span><span class="fu">download</span>(() <span class="kw">=&gt;</span> <span class="fu">serialize</span>(chart)<span class="op">,</span> <span class="kw">undefined</span><span class="op">,</span> <span class="st">"Save as SVG"</span>)</span>
+<span id="cb32-198"><a href="#cb32-198" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;!--</span> DOM<span class="op">.</span><span class="fu">download</span>(() <span class="kw">=&gt;</span> <span class="fu">rasterize</span>(chart)<span class="op">,</span> <span class="kw">undefined</span><span class="op">,</span> <span class="st">"Save as PNG"</span>) <span class="op">--&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-8" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="helper-functions" class="level1">
+<h1>Helper Functions</h1>
+<section id="sparkline-for-table" class="level2">
+<h2 class="anchored" data-anchor-id="sparkline-for-table">Sparkline for table</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33" data-startfrom="206" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 205;"><span id="cb33-206"><a href="#cb33-206" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;!--</span> <span class="im">from</span> https<span class="op">:</span><span class="co">//observablehq.com/@observablehq/input-table#sparkbar --&gt;</span></span>
+<span id="cb33-207"><a href="#cb33-207" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;!--</span> <span class="im">import</span> {sparkbar} <span class="im">from</span> <span class="st">"@observablehq/input-table"</span> <span class="op">--&gt;</span></span>
+<span id="cb33-208"><a href="#cb33-208" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">sparkbar</span>(max) {</span>
+<span id="cb33-209"><a href="#cb33-209" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> x <span class="kw">=&gt;</span> htl<span class="op">.</span><span class="fu">html</span><span class="vs">`&lt;div style="</span></span>
+<span id="cb33-210"><a href="#cb33-210" aria-hidden="true" tabindex="-1"></a><span class="vs">    background: lightblue;</span></span>
+<span id="cb33-211"><a href="#cb33-211" aria-hidden="true" tabindex="-1"></a><span class="vs">    width: </span><span class="sc">${</span><span class="dv">100</span> <span class="op">*</span> x <span class="op">/</span> max<span class="sc">}</span><span class="vs">%;</span></span>
+<span id="cb33-212"><a href="#cb33-212" aria-hidden="true" tabindex="-1"></a><span class="vs">    float: right;</span></span>
+<span id="cb33-213"><a href="#cb33-213" aria-hidden="true" tabindex="-1"></a><span class="vs">    padding-right: 3px;</span></span>
+<span id="cb33-214"><a href="#cb33-214" aria-hidden="true" tabindex="-1"></a><span class="vs">    box-sizing: border-box;</span></span>
+<span id="cb33-215"><a href="#cb33-215" aria-hidden="true" tabindex="-1"></a><span class="vs">    overflow: visible;</span></span>
+<span id="cb33-216"><a href="#cb33-216" aria-hidden="true" tabindex="-1"></a><span class="vs">    display: flex;</span></span>
+<span id="cb33-217"><a href="#cb33-217" aria-hidden="true" tabindex="-1"></a><span class="vs">    justify-content: end;"&gt;</span><span class="sc">${</span>x<span class="op">.</span><span class="fu">toLocaleString</span>(<span class="st">"en"</span>)<span class="sc">}</span><span class="vs">`</span></span>
+<span id="cb33-218"><a href="#cb33-218" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-9" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+
+<script type="ojs-module-contents">
+{"contents":[{"methodName":"interpret","cellName":"ojs-cell-1","inline":false,"source":"viewof dropdown = Inputs.select([null].concat(Object.keys(data_raw[0]).sort()),\n  {value: null, label: \"Sort by\", \n  <!-- sort: true,  // or sort: \"car\"-->\n  unique: true}\n)\n"},{"methodName":"interpret","cellName":"ojs-cell-2","inline":false,"source":"viewof tableData = Inputs.table(data_raw,\n  {sort: dropdown, required: false,\n    format: {\n      mpg: sparkbar(d3.max(data_raw, d => d.mpg)),\n      cyl: sparkbar(d3.max(data_raw, d => d.cyl)),\n      disp: sparkbar(d3.max(data_raw, d => d.disp)),\n      hp: sparkbar(d3.max(data_raw, d => d.hp)),\n      qsec: sparkbar(d3.max(data_raw, d => d.qsec))\n    }\n  }\n)\n"},{"methodName":"interpret","cellName":"ojs-cell-3","inline":false,"source":"tableData\n"},{"methodName":"interpret","cellName":"ojs-cell-4","inline":false,"source":"html`Mean HP: ${(tableData.reduce((a,b) => a + b.hp, 0) / tableData.length) || \"none selected\" }`\n"},{"methodName":"interpret","cellName":"ojs-cell-5","inline":false,"source":"chart = Plot.plot({\n  inset: 8,\n  grid: true,\n  facet: {\n    data: data_raw,\n    y: doFacet && \"cyl\"\n  },\n  color: {\n    legend: true,\n  },\n  marks: [\n    Plot.dot(data_raw,{filter: d => d.hp <= minimum, x: \"cyl\", y: \"mpg\", stroke: \"car\"})\n  ]\n})\n"},{"methodName":"interpret","cellName":"ojs-cell-6","inline":false,"source":"viewof minimum = Inputs.range([min, max], { value: max, step: 1, label: \"hp filter\" })\nviewof doFacet = Inputs.toggle({label: \"Facet\", value: true})\n"},{"methodName":"interpret","cellName":"ojs-cell-7","inline":false,"source":"import {serialize} from \"@mbostock/saving-svg\"\n<!-- rasterize -->\n"},{"methodName":"interpret","cellName":"ojs-cell-8","inline":false,"source":"DOM.download(() => serialize(chart), undefined, \"Save as SVG\")\n<!-- DOM.download(() => rasterize(chart), undefined, \"Save as PNG\") -->\n"},{"methodName":"interpret","cellName":"ojs-cell-9","inline":false,"source":"<!-- from https://observablehq.com/@observablehq/input-table#sparkbar -->\n<!-- import {sparkbar} from \"@observablehq/input-table\" -->\nfunction sparkbar(max) {\n  return x => htl.html`<div style=\"\n    background: lightblue;\n    width: ${100 * x / max}%;\n    float: right;\n    padding-right: 3px;\n    box-sizing: border-box;\n    overflow: visible;\n    display: flex;\n    justify-content: end;\">${x.toLocaleString(\"en\")}`\n}\n"},{"methodName":"interpretQuiet","source":"shinyInput('dropdown')"},{"methodName":"interpretQuiet","source":"shinyInput('tableData')"},{"methodName":"interpretQuiet","source":"shinyInput('minimum')"},{"methodName":"interpretQuiet","source":"shinyInput('doFacet')"}]}
+</script>
+<script type="module">
+window._ojs.paths.runtimeToDoc = "../../..";
+window._ojs.paths.runtimeToRoot = "../../..";
+window._ojs.paths.docToRoot = "";
+window._ojs.selfContained = false;
+window._ojs.runtime.interpretFromScriptTags();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
