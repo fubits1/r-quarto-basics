@@ -1,4 +1,5 @@
-* text=auto
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
 
 # Source files
 # ============
@@ -9,6 +10,7 @@
 *.rds   binary
 *.Rd    text
 *.Rdx   binary
+*.Qmd	  text
 *.Rmd	  text
 *.R  	  text
 *.Rproj text
