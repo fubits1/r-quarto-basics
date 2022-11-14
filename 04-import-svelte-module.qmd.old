@@ -1,0 +1,39 @@
+---
+title: "Importing a Svelte Module"
+format:
+  html:
+    css: ./css/svelte-counter-style.css
+    include-after-body:
+      text: '<script src="./js/svelte-counter.js"></script>'
+---
+
+```{ojs}
+//| echo: false
+//| eval: false
+viewof source = html`<input type=file accept=".js">`
+```
+
+```{ojs}
+//| echo: false
+//| eval: false
+Counter = require(URL.createObjectURL(source))
+```
+
+```{ojs}
+//| echo: false
+targetDom = document.getElementById("counter")
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+(() => {
+  targetDom.innerHTML = ''
+  new Counter({ target: targetDom, props: { initialValue: 13 } })
+})()
+```
+
+::: {#counter}
+Mount here 
+:::
+

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.1.251">
+<meta name="generator" content="quarto-1.0.8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -11,15 +11,10 @@
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
-ul.task-list li input[type="checkbox"] {
-  width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
-  vertical-align: middle;
-}
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -58,7 +53,7 @@ code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
 code span.at { color: #7d9029; } /* Attribute */
 code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
+code span.bu { } /* BuiltIn */
 code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
 code span.ch { color: #4070a0; } /* Char */
 code span.cn { color: #880000; } /* Constant */
@@ -71,7 +66,7 @@ code span.er { color: #ff0000; font-weight: bold; } /* Error */
 code span.ex { } /* Extension */
 code span.fl { color: #40a070; } /* Float */
 code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.im { } /* Import */
 code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 code span.kw { color: #007020; font-weight: bold; } /* Keyword */
 code span.op { color: #666666; } /* Operator */
@@ -95,7 +90,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <link href="01-r-object-to-ojs-interface_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="01-r-object-to-ojs-interface_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="01-r-object-to-ojs-interface_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="01-r-object-to-ojs-interface_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="01-r-object-to-ojs-interface_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet">
 <script type="module" src="01-r-object-to-ojs-interface_files/libs/quarto-ojs/quarto-ojs-runtime.js"></script>
 <link href="01-r-object-to-ojs-interface_files/libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
 <script type="ojs-define">
@@ -116,7 +111,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-  <nav id="TOC" role="doc-toc" class="toc-active">
+  <nav id="TOC" role="doc-toc">
     <h2 id="toc-title">TOC</h2>
    
   <ul>
@@ -1296,32 +1291,14 @@ pre-pending <code>null</code> to allow no choice as inital value</p>
 {"contents":[{"methodName":"interpret","cellName":"ojs-cell-1","inline":false,"source":"viewof dropdown = Inputs.select([null].concat(Object.keys(data_raw[0]).sort()),\n  {value: null, label: \"Sort by\", \n  <!-- sort: true,  // or sort: \"car\"-->\n  unique: true}\n)\n"},{"methodName":"interpret","cellName":"ojs-cell-2","inline":false,"source":"viewof tableData = Inputs.table(data_raw,\n  {sort: dropdown, required: false,\n    format: {\n      mpg: sparkbar(d3.max(data_raw, d => d.mpg)),\n      cyl: sparkbar(d3.max(data_raw, d => d.cyl)),\n      disp: sparkbar(d3.max(data_raw, d => d.disp)),\n      hp: sparkbar(d3.max(data_raw, d => d.hp)),\n      qsec: sparkbar(d3.max(data_raw, d => d.qsec))\n    }\n  }\n)\n"},{"methodName":"interpret","cellName":"ojs-cell-3","inline":false,"source":"tableData\n"},{"methodName":"interpret","cellName":"ojs-cell-4","inline":false,"source":"html`Mean HP: ${(tableData.reduce((a,b) => a + b.hp, 0) / tableData.length) || \"none selected\" }`\n"},{"methodName":"interpret","cellName":"ojs-cell-5","inline":false,"source":"chart = Plot.plot({\n  inset: 8,\n  grid: true,\n  facet: {\n    data: data_raw,\n    y: doFacet && \"cyl\"\n  },\n  color: {\n    legend: true,\n  },\n  marks: [\n    Plot.dot(data_raw,{filter: d => d.hp <= minimum, x: \"cyl\", y: \"mpg\", stroke: \"car\"})\n  ]\n})\n"},{"methodName":"interpret","cellName":"ojs-cell-6","inline":false,"source":"viewof minimum = Inputs.range([min, max], { value: max, step: 1, label: \"hp filter\" })\nviewof doFacet = Inputs.toggle({label: \"Facet\", value: true})\n"},{"methodName":"interpret","cellName":"ojs-cell-7","inline":false,"source":"import {serialize} from \"@mbostock/saving-svg\"\n<!-- rasterize -->\n"},{"methodName":"interpret","cellName":"ojs-cell-8","inline":false,"source":"DOM.download(() => serialize(chart), undefined, \"Save as SVG\")\n<!-- DOM.download(() => rasterize(chart), undefined, \"Save as PNG\") -->\n"},{"methodName":"interpret","cellName":"ojs-cell-9","inline":false,"source":"<!-- from https://observablehq.com/@observablehq/input-table#sparkbar -->\n<!-- import {sparkbar} from \"@observablehq/input-table\" -->\nfunction sparkbar(max) {\n  return x => htl.html`<div style=\"\n    background: lightblue;\n    width: ${100 * x / max}%;\n    float: right;\n    padding-right: 3px;\n    box-sizing: border-box;\n    overflow: visible;\n    display: flex;\n    justify-content: end;\">${x.toLocaleString(\"en\")}`\n}\n"},{"methodName":"interpretQuiet","source":"shinyInput('dropdown')"},{"methodName":"interpretQuiet","source":"shinyInput('tableData')"},{"methodName":"interpretQuiet","source":"shinyInput('minimum')"},{"methodName":"interpretQuiet","source":"shinyInput('doFacet')"}]}
 </script>
 <script type="module">
-window._ojs.paths.runtimeToDoc = "../../..";
-window._ojs.paths.runtimeToRoot = "../../..";
+window._ojs.paths.runtimeToDoc = "..\..\..";
+window._ojs.paths.runtimeToRoot = "..\..\..";
 window._ojs.paths.docToRoot = "";
 window._ojs.selfContained = false;
 window._ojs.runtime.interpretFromScriptTags();
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
-    }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();  
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {
@@ -1371,8 +1348,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   for (var i=0; i<noterefs.length; i++) {
     const ref = noterefs[i];
     tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      let href = ref.getAttribute('href');
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
