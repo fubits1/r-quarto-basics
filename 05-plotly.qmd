@@ -1,0 +1,151 @@
+---
+title: "Quarto & Plotly"
+format:
+  html:
+    toc: true
+    toc-title: "TOC"
+    css: ./css/style.css
+---
+
+# R: Prepare data
+
+```{r message=FALSE}
+library(tidyverse)
+```
+
+```{r}
+data <- palmerpenguins::penguins %>% 
+  mutate(across(where(is.factor), as.character)) %>% 
+  filter(!is.na(sex))
+```
+
+```{r}
+data %>% 
+  ggplot(aes(x = sex, group = island, fill = island)) +
+    geom_bar(position = position_dodge())
+```
+
+
+```{r}
+head(data)
+```
+
+# OJS: Expose data for OJS
+
+```{r}
+ojs_define(data = transpose(data))
+```
+
+> d3 is needed for grouping / aggregation
+
+```{ojs}
+d3 = require("d3-array")
+```
+
+```{ojs}
+Plotly = require("https://cdn.plot.ly/plotly-2.16.1.min.js")
+```
+
+```{ojs}
+Inputs.table(data)
+```
+
+# Aggregate (with JS / D3)
+
+> Goal: reduce data to group counts with JavaScript  
+This way we preserve runtime reactivity and don't need to rely on static R inputs 
+
+> Group by Species & Sex, Count Totals (length) 
+
+```{ojs}
+data_aggregated = d3
+  .flatRollup(
+    data,
+    (facet) => facet.length,  // index: 2  
+    (row) => row.island,      // index: 0
+    (row) => row.sex          // index: 1
+  )
+  // abstraction / parametarisation for Plotly (x,y, name) here
+  // .map((entry) => ({ island: entry[0], sex: entry[1], n: entry[2] }))
+  .map((entry) => ({ name: entry[0], x: entry[1], y: entry[2] }))
+  .sort((a,b) => a.name.localeCompare(b.name)) // to put facet names in A-Z order
+```
+
+```{ojs}
+data_grouped = d3.group(data_aggregated, (d) => d.name)
+```
+
+## Facet Result Template
+
+> Create a template for an object for a single facet (~ trace)
+
+```{ojs}
+toVars = ["x", "y", "name", "type"]
+```
+
+
+```{ojs}
+resultObject = ({})
+```
+
+```{ojs}
+//| include: false
+toVars.forEach((variable) => (resultObject[variable] = []))
+```
+
+```{ojs}
+//| eval: false
+// the manual mapping is only necessary if you don't abstract during aggregation
+fromVars = [
+  {from: "sex", to: "x"},
+  {from: "n", to: "y" }
+]
+```
+
+## Aggregate Facets
+
+```{ojs}
+result = [...data_grouped.entries()].map((trace) => {
+  const traceObj = JSON.parse(JSON.stringify(resultObject)); // copy the Object template
+  traceObj.name = trace[0]; // facet's name / Map's key (here: island)
+  traceObj.type = "bar"; // TODO: make global param
+  traceObj.text = trace[1].map((entry) => `n: ${entry.y}`); // TODO: make n a param
+  trace[1].forEach((entry) => {
+    // fromVars.forEach((mapping) => {
+    //   traceObj[mapping.to].push(entry[mapping.from]);
+    ["x", "y"].forEach((mapping) => {
+      traceObj[mapping].push(entry[mapping]);
+    });
+  });
+  return traceObj;
+})
+```
+
+# Plot data with Plotly
+
+## Plot Options
+
+```{ojs}
+options = ({
+  title: "Count of Penguins by Gender & Island",
+  barmode: doStack ? "stack" : "group" // "group", "stack", "relative"
+})
+```
+
+## Reactive Stack Toogle
+
+```{ojs}
+//| echo: false
+viewof doStack = Inputs.toggle({ label: "Stack", value: false })
+```
+
+
+## Plotly Plot
+
+```{ojs}
+//| include: false
+Plotly.newPlot("plot-canvas", result, options)
+```
+
+::: {#plot-canvas}
+:::
