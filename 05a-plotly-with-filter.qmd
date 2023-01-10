@@ -1,0 +1,164 @@
+---
+title: "Quarto & Plotly"
+format:
+  html:
+    toc: true
+    toc-title: "TOC"
+    css: ./css/style.css
+---
+
+# R: Prepare data
+
+```{r message=FALSE}
+library(tidyverse)
+data <- palmerpenguins::penguins %>% 
+  mutate(across(where(is.factor), as.character)) %>% 
+  filter(!is.na(sex))
+ojs_define(data = transpose(data))
+```
+
+```{ojs}
+//| echo: false
+d3 = require("d3-array")
+```
+
+```{ojs}
+//| echo: false
+Plotly = require("https://cdn.plot.ly/plotly-2.16.1.min.js")
+```
+
+> see origin of filtered `data_used` below
+
+```{ojs}
+Inputs.table(data_used)
+```
+
+```{ojs}
+//| echo: false
+data_aggregated = d3
+  .flatRollup(
+    data_used,
+    (facet) => facet.length,  // index: 2  
+    (row) => row.island,      // index: 0
+    (row) => row.sex          // index: 1
+  )
+  // abstraction / parametarisation for Plotly (x,y, name) here
+  // .map((entry) => ({ island: entry[0], sex: entry[1], n: entry[2] }))
+  .map((entry) => ({ name: entry[0], x: entry[1], y: entry[2] }))
+  .sort((a,b) => a.name.localeCompare(b.name)) // to put facet names in A-Z order
+```
+
+```{ojs}
+//| echo: false
+data_grouped = d3.group(data_aggregated, (d) => d.name)
+```
+
+```{ojs}
+//| echo: false
+toVars = ["x", "y", "name", "type"]
+```
+
+
+```{ojs}
+//| echo: false
+resultObject = ({})
+```
+
+```{ojs}
+//| echo: false
+//| include: false
+toVars.forEach((variable) => (resultObject[variable] = []))
+```
+
+```{ojs}
+//| eval: false
+//| echo: false
+// the manual mapping is only necessary if you don't abstract during aggregation
+fromVars = [
+  {from: "sex", to: "x"},
+  {from: "n", to: "y" }
+]
+```
+
+
+```{ojs}
+//| echo: false
+result = [...data_grouped.entries()].map((trace) => {
+  const traceObj = JSON.parse(JSON.stringify(resultObject)); // copy the Object template
+  traceObj.name = trace[0]; // facet's name / Map's key (here: island)
+  traceObj.type = "bar"; // TODO: make global param
+  traceObj.text = trace[1].map((entry) => `n: ${entry.y}`); // TODO: make n a param
+  trace[1].forEach((entry) => {
+    // fromVars.forEach((mapping) => {
+    //   traceObj[mapping.to].push(entry[mapping.from]);
+    ["x", "y"].forEach((mapping) => {
+      traceObj[mapping].push(entry[mapping]);
+    });
+  });
+  return traceObj;
+})
+```
+
+## Reactive UI Elements
+
+### Species Filter Logic
+
+```{ojs}
+speciesCount = d3.rollups(data,
+  v => v.length,
+  d => d.species)
+  .map(row => ({Species: row[0], n: row[1]}))
+
+speciesFilter = [...new Set(speciesSelection.map(row => row.Species))]
+
+data_used = speciesFilter.length !== speciesCount.length
+  ? data.filter(d => speciesFilter.includes(d.species))
+  : data
+```
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+### Species Filter
+
+```{ojs}
+//| echo: false
+viewof speciesSelection = Inputs.table(
+  speciesCount,
+  {
+    value: speciesCount,
+    required: true
+  }
+)
+```
+
+:::
+
+::: {.column width="50%"}
+
+### Stack Toogle
+
+```{ojs}
+//| echo: false
+viewof doStack = Inputs.toggle({ label: "Stack", value: false })
+```
+
+:::
+::::
+
+```{ojs}
+//| include: false
+//| echo: false
+Plotly.newPlot("plot-canvas", result, options)
+```
+
+::: {#plot-canvas}
+:::
+
+```{ojs}
+options = ({
+  title: `Count of Penguins by Gender & Island (n: ${data_used.length})`,
+  barmode: doStack ? "stack" : "group"
+})
+```
