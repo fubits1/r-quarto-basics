@@ -6,8 +6,23 @@ format:
     toc: true
     embed-resources: true
 params:
-  compress: true
+  compress: false
 ---
+
+```{r compress-param}
+#| echo: false 
+#| 
+# this is only necessary for this example to make it possible to render two different versions - with and without compression - using the same data. 
+# needed because of param setting by render script (cf. https://stackoverflow.com/questions/73571919/how-to-pass-logical-parameters-with-the-quarto-r-package-to-the-knitr-chunk-opti)
+compress <- as.logical(params$compress) 
+ojs_define(compress_ojs = compress) # for later in js 
+```
+
+::: {.callout-important }
+
+Using compression: `r params$compress`
+
+:::
 
 Problem:
 
@@ -30,11 +45,11 @@ library(quarto)
 
 # https://feederwatch.org/explore/raw-dataset-requests/ 
 # https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-10
-#test_data <- read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-10/PFW_2021_public.csv')
+test_data <- read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-10/PFW_2021_public.csv')
 
 # for interactive development, use penguins to speed up
-library(palmerpenguins)
-test_data <- palmerpenguins::penguins
+# library(palmerpenguins)
+# test_data <- palmerpenguins::penguins
 
 str(test_data)
 ```
@@ -46,16 +61,6 @@ test_data_json <- jsonlite::toJSON(test_data)
 str(test_data_json)
 ```
 
-
-
-```{r compress-param}
-#| echo: false 
-#| 
-# this is only necessary for this example to make it possible to render two different versions - with and without compression - using the same data. 
-# needed because of param setting by render script (cf. https://stackoverflow.com/questions/73571919/how-to-pass-logical-parameters-with-the-quarto-r-package-to-the-knitr-chunk-opti)
-compress <- as.logical(params$compress) 
-ojs_define(compress_ojs = params$compress) # for later in js 
-```
 
 we extract the compression into a little helper function:
 
@@ -106,7 +111,6 @@ buffer = require('https://bundle.run/buffer@6.0.3') // ~8kb
 ```{ojs}
 zlib = require('https://bundle.run/browserify-zlib@0.2.0') // ~30kb here we could check whether we can just import inflateSync
 ```
-
 
 ```{ojs}
 data = {
