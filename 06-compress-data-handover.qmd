@@ -1,0 +1,127 @@
+---
+title: "Compress and decompress data to make HTML files smaller"
+format:
+  html:
+    theme: zephyr
+    toc: true
+    embed-resources: true
+params:
+  compress: true
+---
+
+Problem:
+
+whenever we "handover" data from R to OJS with `ojs_define` , it gets "injected" into the `head` of the HTML as is. This blows up the file size of the HTML output. 
+
+Here, we use [gzip](https://en.wikipedia.org/wiki/Gzip) to  
+
+- compress ("deflate") data in R
+- decompress ("inflate") the compressed data in OJS
+
+Whether or not data should be compressed can be controlled with the `compress` parameter in the yaml header. 
+
+## Compression in R 
+
+
+```{r setup}
+# quarto library and test data
+library(quarto)
+
+
+# https://feederwatch.org/explore/raw-dataset-requests/ 
+# https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-01-10
+#test_data <- read.csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-10/PFW_2021_public.csv')
+
+# for interactive development, use penguins to speed up
+library(palmerpenguins)
+test_data <- palmerpenguins::penguins
+
+str(test_data)
+```
+
+First we bring the data into a format that we can compress, i.e. a text-format. Here, we do JSON. It is a "row" json, i.e. a list of objects where each object represents a row. This is good because that's also what many Javascript libraries work with by default. 
+
+```{r convert-json}
+test_data_json <- jsonlite::toJSON(test_data)
+str(test_data_json)
+```
+
+
+
+```{r compress-param}
+#| echo: false 
+#| 
+# this is only necessary for this example to make it possible to render two different versions - with and without compression - using the same data. 
+# needed because of param setting by render script (cf. https://stackoverflow.com/questions/73571919/how-to-pass-logical-parameters-with-the-quarto-r-package-to-the-knitr-chunk-opti)
+compress <- as.logical(params$compress) 
+ojs_define(compress_ojs = params$compress) # for later in js 
+```
+
+we extract the compression into a little helper function:
+
+```{r compress-fun}
+compress_for_ojs <- function(string) {
+  # gzip 
+  compressed_raw <-  memCompress(charToRaw(string), "gzip") # raw vector
+  # convert each element of vector from hex to decimal
+  # needed because the decompression in js expects it this way and not as hex
+  # TODO: check whether an option in decompress function can also make hex acceptable
+  compressed_decimal <- as.numeric(compressed_raw) 
+  return(compressed_decimal)
+}
+```
+
+
+now we use the compression function or just hand over the json to ojs if `compress = FALSE`.
+
+```{r do-compress}
+if (compress) {
+  compressed <- compress_for_ojs(test_data_json)
+  ojs_define(data_ojs = compressed)
+} else {
+  # no compression, just hand over json as is
+  ojs_define(data_ojs = test_data_json)
+}
+```
+
+
+```{r debug-info}
+#| echo: false
+if (compress) {
+  print(paste("Length of uncompressed JSON string:", nchar(test_data_json)))
+  nchar_comp <- nchar(paste(compressed, collapse = ""))
+  print(paste("Length of compressed string", nchar_comp)) # number of characters 
+}
+```
+
+
+## Decompress in OJS 
+
+For decompression, we need to load two libraries: `buffer` and `zlib.` `buffer` is needed to create the input for the `decompress` function of zlib. Both libraries are originally not designed for the browser but we can use "browserified" versions that have been made available. [This](https://observablehq.com/@observablehq/module-require-debugger) is a very useful tool for OJS to check whether/how npm libraries can be used in OJS. 
+
+```{ojs}
+buffer = require('https://bundle.run/buffer@6.0.3') // ~8kb
+```
+
+```{ojs}
+zlib = require('https://bundle.run/browserify-zlib@0.2.0') // ~30kb here we could check whether we can just import inflateSync
+```
+
+
+```{ojs}
+data = {
+  if (compress_ojs) {
+    // if compression was done, decompress
+    let decompressed = zlib.inflateSync(new buffer.Buffer(data_ojs, 'base64')).toString()
+    return(decompressed)
+  } else {
+    return(data_ojs)
+  }
+}
+```
+
+
+```{ojs}
+Inputs.table(JSON.parse(data))
+```
+
