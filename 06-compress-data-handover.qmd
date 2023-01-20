@@ -6,7 +6,7 @@ format:
     toc: true
     embed-resources: true
 params:
-  compress: false
+  compress: "yes" # or "no"
 ---
 
 ```{r compress-param}
@@ -14,7 +14,7 @@ params:
 #| 
 # this is only necessary for this example to make it possible to render two different versions - with and without compression - using the same data. 
 # needed because of param setting by render script (cf. https://stackoverflow.com/questions/73571919/how-to-pass-logical-parameters-with-the-quarto-r-package-to-the-knitr-chunk-opti)
-compress <- as.logical(params$compress) 
+compress <- params$compress == "yes"
 ojs_define(compress_ojs = compress) # for later in js 
 ```
 
@@ -38,7 +38,7 @@ Whether or not data should be compressed can be controlled with the `compress` p
 ## Compression in R 
 
 
-```{r setup}
+```{r setup-data}
 # quarto library and test data
 library(quarto)
 

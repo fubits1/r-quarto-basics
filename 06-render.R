@@ -1,18 +1,30 @@
-# render for both true and false for comparison
-lapply(c("false", "true"), function(compress_bool) {
-  file_name <- sprintf("06-compress-data-handover_%s.html", tolower(compress_bool))
+# benchmark
+out_file_root <- "06-compress-data-handover_"
+
+render_compress <- function(compress_bool) {
+  file_name <- paste0(out_file_root, tolower(compress_bool), ".html")
   quarto::quarto_render("06-compress-data-handover.qmd", 
                         output_file = file_name,
-                        execute_params = list(compress = compress_bool))
-})
+                        execute_params = list(compress = compress_bool), quiet = TRUE)
+}
 
+# render for both true and false for comparison
+tictoc::tic("rendering with compression")
+render_compress(TRUE)# TRUE gets handed over as "yes"
+tictoc::toc()
+
+
+tictoc::tic("rendering without compression")
+render_compress(FALSE)# FALSE gets handed over as "no"
+tictoc::toc()
 
 # compare file sizes
-out_files <- list.files("outputs", pattern = "06", full.names = TRUE)
-sizes <- file.size(out_files)
+sizes <- data.frame(compress = c(TRUE, FALSE))
+sizes$out_file <- paste0("outputs/", out_file_root, tolower(sizes$compress), ".html")
 
-sapply(seq_along(out_files), function(i) {
-  size_hr <- utils:::format.object_size(file.size(out_files[i]), "auto")
-  return(paste0(out_files[i], ": ", size_hr))
+sizes$size <- sapply(sizes$out_file, function(file_name) {
+  size_hr <- utils:::format.object_size(file.size(file_name), "auto")
+  return(size_hr)
 })
 
+sizes
